@@ -1,0 +1,242 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled0.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyMq7jeg3eECuzMzVLTfMrhv",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/jairoalves/python-misc/blob/main/foo%20bar%20with%20google\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def confirm_pattern(ptn, string):\n",
+        "    ''' Confirms a pattern exists to the end of the string'''\n",
+        "    while(len(string)):\n",
+        "        string_start_ok = ptn == string[:len(ptn)]\n",
+        "        if string_start_ok:\n",
+        "            string = string[len(ptn):]\n",
+        "        else:\n",
+        "            return False\n",
+        "    \n",
+        "    return True  \n",
+        "\n",
+        "\n",
+        "def solution(string):\n",
+        "    ''' Returns the largest pattern in the string.'''\n",
+        "    solution = 1\n",
+        "    \n",
+        "    for ptn_len in range(1, len(string)):\n",
+        "        ptn_candidate = string[:ptn_len]\n",
+        "        ptn_is_valid = confirm_pattern(ptn_candidate, string)\n",
+        "        if ptn_is_valid:\n",
+        "            solution = len(string) / ptn_len\n",
+        "            return int(solution)\n",
+        "    return int(solution)"
+      ],
+      "metadata": {
+        "id": "SwEqg-dH_38N"
+      },
+      "execution_count": 100,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def check():\n",
+        "  return (\n",
+        "    solution(0, 1) == 3\n",
+        "    and\n",
+        "    solution(19, 36) == 1\n",
+        "  )"
+      ],
+      "metadata": {
+        "id": "6uZrA6iCrYFg"
+      },
+      "execution_count": 1,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "# Prob 2"
+      ],
+      "metadata": {
+        "id": "fzxx4BYYSMDL"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def create_board():\n",
+        "  '''Creates a board with 0 - 63 squares.\n",
+        "  returns a dict with values equal to \n",
+        "  a tuple, as the board coordinates,\n",
+        "  and the key is the square number.\n",
+        "  '''\n",
+        "\n",
+        "  board = {x + 8*y: (x, y) for y in range(8) for x in range(8)}\n",
+        "  return board"
+      ],
+      "metadata": {
+        "id": "BoQs2ANVCohi"
+      },
+      "execution_count": 27,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def get_valid_next_squares(cur_sq, board):\n",
+        "  '''Given the current square number, \n",
+        "  returns set of all valid next possible squares'''\n",
+        "\n",
+        "  cur_coord = board[cur_sq]\n",
+        "  next_squares = set()\n",
+        "  possible_deltas = [(-1, -2), (-1, 2), (1, -2), (1, 2),\\\n",
+        "                     (-2, -1), (-2, 1), (2, -1), (2, 1),]\n",
+        "\n",
+        "  for x_delta, y_delta in possible_deltas:\n",
+        "    new_sq = (cur_coord[0] + x_delta, cur_coord[1] + y_delta)\n",
+        "    new_sq_is_valid = (\n",
+        "        (new_sq[0] >= 0 and new_sq[1] >= 0) \n",
+        "        and (new_sq[0] < 8 and new_sq[1] < 8))\n",
+        "    if new_sq_is_valid:\n",
+        "      next_squares.add(new_sq[0] + 8*new_sq[1])\n",
+        "  return next_squares"
+      ],
+      "metadata": {
+        "id": "OR8CpGwPJ5JX"
+      },
+      "execution_count": 84,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def get_next_depth_valid_squares(current_valid_sqs, board):\n",
+        "  '''Given a list of current valid squares, returns a set\n",
+        "  of all possible next depth squares to search'''\n",
+        "  all_possible_next_sqs = set()\n",
+        "  for sq in current_valid_sqs:\n",
+        "    cur_sq_neighbors = get_valid_next_squares(sq, board)\n",
+        "    all_possible_next_sqs.update(cur_sq_neighbors)\n",
+        "  return all_possible_next_sqs"
+      ],
+      "metadata": {
+        "id": "UaHL6npJYVm1"
+      },
+      "execution_count": 170,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def check_if_neighbors(sq1, sq2, board):\n",
+        "  '''Given two arbitrary squares,\n",
+        "  returns true if they are neighbours, false otherwise.'''\n",
+        "\n",
+        "  sq1_neighbors = get_valid_next_squares(sq1, board)\n",
+        "  return sq2 in sq1_neighbors"
+      ],
+      "metadata": {
+        "id": "hDad-F_xTEXM"
+      },
+      "execution_count": 171,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def solution(src, dest, max_depth=10):\n",
+        "  '''Returns the number of knight jumps \n",
+        "  from initial square to the final square'''\n",
+        "\n",
+        "  board = create_board()\n",
+        "  cur_sq = src\n",
+        "  depth = 0\n",
+        "\n",
+        "  if src == dest:\n",
+        "    return 0\n",
+        "  \n",
+        "  depth += 1\n",
+        "  neighbors_next_layer =  [cur_sq]\n",
+        "  if check_if_neighbors(cur_sq, dest, board):\n",
+        "    return depth\n",
+        "  \n",
+        "  while(depth < max_depth):\n",
+        "    depth += 1\n",
+        "    valid_sqs_this_depth = neighbors_next_layer\n",
+        "    neighbors_next_layer = get_next_depth_valid_squares(\n",
+        "        valid_sqs_this_depth, board)\n",
+        "    for neighbor in neighbors_next_layer:\n",
+        "      if check_if_neighbors(neighbor, dest, board):\n",
+        "        return depth\n",
+        "      \n",
+        "  return max_depth\n"
+      ],
+      "metadata": {
+        "id": "yZqRwlRKQc3S"
+      },
+      "execution_count": 194,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "solution(0, 7)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6nnaKqyaS_xg",
+        "outputId": "4b89fe69-483e-4d80-c944-af4f477eaf31"
+      },
+      "execution_count": 195,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "5"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 195
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        ""
+      ],
+      "metadata": {
+        "id": "4ymSlUFEUw9Q"
+      },
+      "execution_count": 191,
+      "outputs": []
+    }
+  ]
+}
